@@ -1,0 +1,56 @@
+// needs to be updated to factor in window re-sizes. Will sort later.
+
+
+jQuery(function($) {
+  var longPage = document.querySelector('.row .col-md-8') ? document.querySelector('.row .col-md-8') : undefined;
+  // checks to see if it's 8/4 template which usually has multiple H2 tags - was planned to be targeted at specific pages.
+  if (typeof(longPage) !== 'undefined') {
+    var currentmax = 0;
+     // how far you've gone down page.
+var ftimer = 0;
+var callBackTime = 100;
+     // buffer to avoid spam
+ 
+    var test = $('article h2').map(function() {
+      return {
+        "offset": ($(this).offset().top - $('header .primary-nav').height()),
+        "label": $(this).text()
+      };
+    });
+     // gathering co-ords and headings.
+    
+    var headings = jQuery.map(test, function(value) {
+      return value.label;
+    });
+     // array of headings
+    
+    var positions = jQuery.map(test, function(value) {
+      return value.offset;
+    });
+    
+     // array of y co-ords
+ 
+    var bottom = $(window).height() + $(window).scrollTop() - $('header .primary-nav').height();
+     // current position
+ 
+    function trackHeading() {
+      bottom = $(window).height() + $(window).scrollTop() - $('header .primary-nav').height();
+      while (bottom > positions[currentmax]) {
+           dataLayer.push({"heading" : headings[currentmax], "event" : "scrollheading", "headingdepth" : currentmax + 1 });  
+           //above pushes a custom event to GTM's dataLayer. A custom event trigger would need to be setup to listen for the "scrollheading event"
+        console.log(headings[currentmax] + ' (' + (currentmax + 1) + ')');
+           // for debugging ^
+        currentmax++;
+      }
+ 
+    }
+ 
+    $(window).scroll(function() {
+      if (ftimer) {
+        clearTimeout(ftimer);
+      }
+      ftimer = setTimeout(trackHeading, callBackTime);
+       // as you scroll down, re-checks the position and outputs. Would create a resize function for live. Unnecessary.
+    });
+  }
+});
