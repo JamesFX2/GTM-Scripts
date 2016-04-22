@@ -1,0 +1,70 @@
+<script>
+    // script that increments a cookie based counter based on how many visits they've made to the site without converting. 
+    //  Modification exists for any goal completions.
+    var transactionCompleteURL = 'checkout/onepage/success';
+    var transactionCompleted = (window.location.href.indexOf(transactionCompleteURL) > -1);
+
+    // I want to reset the cookie when a transaction is completed.
+
+    if(transactionCompleted)
+    {
+        eraseCookie('_siteVisits');
+    }
+
+
+    var liveSession = readCookie('_liveSession');
+    if(liveSession===null)
+    {
+        fireVisitCookie();
+
+    }
+    updateCookie('_liveSession',1,0.084);
+
+
+
+
+
+
+  function fireVisitCookie() {
+
+    var cookieVisits = readCookie('_siteVisits');
+    var totalVisits = cookieVisits ? parseInt(cookieVisits) : 0;
+    createCookie('_siteVisits',totalVisits+1,120);
+  }  
+
+
+
+  function updateCookie(name, initValue, days) {
+    if (readCookie(name) !== null) {
+      var value = readCookie(name);
+      createCookie(name, value, days);
+    } else {
+      createCookie(name, initValue, days);
+    }
+  }
+
+  function createCookie(name, value, days) {
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      var expires = "; expires=" + date.toGMTString();
+    } else var expires = "";
+    document.cookie = name + "=" + value + expires + "; path=/";
+  }
+
+  function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+
+  function eraseCookie(name) {
+    createCookie(name, "", -1);
+  }
+
+  </script>
