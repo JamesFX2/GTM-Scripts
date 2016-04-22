@@ -1,0 +1,86 @@
+<script>
+  var OoDvalue = "";
+  var hackyFix = true;
+
+  var InternalReferral = "example.com";
+  // change to name of site
+    var OoDcookieName = '_OrgOrDirect';
+  // cookie name
+  var OoDcookieSet = 'narwhal';
+  // value if set
+
+  if (document.referrer.toLowerCase().indexOf(InternalReferral) < 0)
+  {
+      // clears the cookie unless the referral source is internal
+      eraseCookie(OoDcookieName);
+      hackyFix = false;
+
+  }
+
+  if (readCookie(OoDcookieName) !== null && hackyFix) {
+      OoDvalue = readCookie(OoDcookieName);
+    // reads the stored referral source.
+  }
+
+  if (document.referrer === "" || (document.referrer.indexOf('www.google.') > -1 && window.location.href.toLowerCase().indexOf('gclid=') < 0) || OoDvalue == OoDcookieSet) {
+    // if referral is direct, from www.google but doesn't include a gclid OR the stored cookie value says they were direct/organic
+
+    updateCookie(OoDcookieName, OoDcookieSet, 30);
+    // 30 = 30 days cookie length. Increase if you want. 
+
+    itsOrganicOrDirect();
+    // fires the event. 
+  }
+  else {
+
+   // its not. Nothing happens here. 
+
+
+  }
+
+
+
+  function itsOrganicOrDirect() {
+
+   //pushes an event and no value. Left placeholder if you wanted to push some value and weren't familiar with JSON
+    dataLayer.push({
+      'event': 'OrganicOrDirect',
+      'placeholder': 'hello'
+    });
+
+  }
+
+  function updateCookie(name, initValue, days) {
+    if (readCookie(name) !== null) {
+      var value = readCookie(name);
+      createCookie(name, value, days);
+    } else {
+      createCookie(name, initValue, days);
+    }
+  }
+
+  function createCookie(name, value, days) {
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      var expires = "; expires=" + date.toGMTString();
+    } else var expires = "";
+    document.cookie = name + "=" + value + expires + "; path=/";
+  }
+
+  function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+
+  function eraseCookie(name) {
+    createCookie(name, "", -1);
+  }
+
+  </script>
