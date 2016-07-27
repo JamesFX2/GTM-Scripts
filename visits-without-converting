@@ -4,6 +4,7 @@
   var po_sessions = {
 
     visitCookie: '_siteVisits',
+    cookieDomain: 'chillfactore.com',
     liveCookie: '_liveSession',
     formPhase2: 'booking2.chillfactore.com',
     formPhase2Reached: function() {
@@ -32,19 +33,24 @@
     },
     updateCookie: function(name, initValue, days) {
       if (this.readCookie(name) !== null) {
-        var value = this.readCookie(name);
+         var value = this.readCookie(name);
         this.createCookie(name, value, days);
       } else {
         this.createCookie(name, initValue, days);
       }
     },
     createCookie: function(name, value, days) {
+      var path = "; path=/";
       if (days) {
         var date = new Date();
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         var expires = "; expires=" + date.toGMTString();
       } else var expires = "";
-      document.cookie = name + "=" + value + expires + "; path=/";
+      if(this.cookieDomain)
+      {
+        path = ";domain=."+this.cookieDomain+path;
+      }
+      document.cookie = name + "=" + value + expires + path;
     },
     fireVisitCookie: function(name)  {
       var cookieVisits = this.readCookie(name);
@@ -63,7 +69,7 @@
       if(this.liveSession() == 1 && this.formPhase2Reached())
       {
         this.fireVisitCookie(this.formCookie);
-        console.log("debug");
+		this.eraseCookie(this.liveCookie);
         this.updateCookie(this.liveCookie,2,0);
       }
       if(this.transactionCompleted())
