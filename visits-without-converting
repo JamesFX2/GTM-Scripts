@@ -1,17 +1,19 @@
 <script>
     // script that increments a cookie based counter based on how many visits they've made to the site without converting. 
     //  Modification exists for any goal completions
-    // config is URL of transaction complete and phase2
-    
   var po_sessions = {
 
     visitCookie: '_siteVisits',
     liveCookie: '_liveSession',
     formPhase2: 'booking2.chillfactore.com',
-    formPhase2Reached: (window.location.href.indexOf(this.formPhase2) > -1),
+    formPhase2Reached: function() {
+      return (window.location.href.indexOf(this.formPhase2) > -1);
+    },
     formCookie: '_formSession',
     transactionCompleteURL: '/confirmation.aspx', 
-    transactionCompleted: (window.location.href.indexOf(this.transactionCompleteURL) > -1),
+    transactionCompleted: function() { 
+      return (window.location.href.indexOf(this.transactionCompleteURL) > -1);
+    },
     eraseCookie: function(name) 
     {
       this.createCookie(name, "", -1);
@@ -47,9 +49,9 @@
     fireVisitCookie: function(name)  {
       var cookieVisits = this.readCookie(name);
       var totalVisits = cookieVisits ? parseInt(cookieVisits) : 0;
-      this.createCookie(this.visitCookie,totalVisits+1,120);     
+      this.createCookie(name,totalVisits+1,120);     
     },    
-    initalise: function() 
+    initialise: function() 
     {
       
       if(this.liveSession() == null)
@@ -58,16 +60,18 @@
       }
       this.updateCookie(this.liveCookie,1,0);
       
-      if(this.liveSession() == 1 && this.formPhase2Reached)
+      if(this.liveSession() == 1 && this.formPhase2Reached())
       {
         this.fireVisitCookie(this.formCookie);
+        console.log("debug");
         this.updateCookie(this.liveCookie,2,0);
       }
-      if(this.transactionCompleted)
+      if(this.transactionCompleted())
       {
         this.eraseCookie(this.visitCookie);
         this.eraseCookie(this.formCookie);
       }
+      return true;
     },
     liveSession: function() { 
 		return this.readCookie(this.liveCookie);
@@ -78,6 +82,10 @@
     formCounter: function() {
 		return this.readCookie(this.formCookie);
     }
-
   };
+  
+  po_sessions.initialise();
+  
+
+
   </script>
